@@ -13,11 +13,23 @@ namespace DurableFunctionExample
         {
             var videoLocation = ctx.GetInput<string>();
 
-            var transcodedLocation = await ctx.CallActivityAsync<string>("A_TranscodeVideo", videoLocation);
+            if (!ctx.IsReplaying)
+                log.Info("About to call transcode video activity");
 
-            var thumbnailLocation = await ctx.CallActivityAsync<string>("A_ExtractThumbnail", transcodedLocation);
+            var transcodedLocation = await 
+                ctx.CallActivityAsync<string>("A_TranscodeVideo", videoLocation);
 
-            var withIntoLocation = await ctx.CallActivityAsync<string>("A_PrependIntro", transcodedLocation);
+            if (!ctx.IsReplaying)
+                log.Info("About to call extract thumbnail");
+
+            var thumbnailLocation = await 
+                ctx.CallActivityAsync<string>("A_ExtractThumbnail", transcodedLocation);
+
+            if (!ctx.IsReplaying)
+                log.Info("About to call prepend intro");
+
+            var withIntoLocation = await 
+                ctx.CallActivityAsync<string>("A_PrependIntro", transcodedLocation);
 
             return new
             {
